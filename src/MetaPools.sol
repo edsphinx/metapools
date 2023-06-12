@@ -98,4 +98,17 @@ contract MetaPools {
 
         emit ResultsDeclared(poolId, winningPredictionCount, pool.prizePool);
     }
+
+    function getPoolParticipants(
+        uint poolId
+    ) external view returns (address[] memory) {
+        return pools[poolId].participants;
+    }
+
+    function getParticipantPredictions(
+        uint poolId,
+        address participant
+    ) external view returns (bytes32[] memory) {
+        return pools[poolId].predictions[participant];
+    }
 }
