@@ -2,6 +2,8 @@
 
 pragma solidity ^0.8.19;
 
+import {ERC721} from "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
+
 contract MetaPools {
     enum PoolType {
         Public,
@@ -48,10 +50,11 @@ contract MetaPools {
         require(!pool.closed, "Pool is closed for predictions");
 
         if (pool.poolType == PoolType.Private) {
-            // Add custom logic for joining a private pool
-            // E.g., check if the participant is invited or has a password
-            // Implement any additional validation as per your requirements
-            // You may require additional storage to track private pool invitations/passwords
+            address nftContractAddress = 0x22C1f6050E56d2876009903609a2cC3fEf83B415;
+            require(
+                hasNFT(nftContractAddress, msg.sender),
+                "Participant does not have the required NFT"
+            );
         }
 
         require(msg.value == pool.entryFee, "Incorrect entry fee");
@@ -110,5 +113,14 @@ contract MetaPools {
         address participant
     ) external view returns (bytes32[] memory) {
         return pools[poolId].predictions[participant];
+    }
+
+    function hasNFT(
+        address nftContractAddress,
+        address participant
+    ) internal view returns (bool) {
+        ERC721 nftContract = ERC721(nftContractAddress);
+        uint256 balance = nftContract.balanceOf(participant);
+        return balance > 0;
     }
 }
